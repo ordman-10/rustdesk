@@ -121,6 +121,38 @@ impl Drop for SimpleCallOnReturn {
     }
 }
 
+use std::path::PathBuf;
+use ini::Ini;
+
+// 获取exe所在运行目录
+pub fn get_app_dir() -> PathBuf {
+    let mut path = std::env::current_exe().unwrap_or_else(|_| PathBuf::from("."));
+    path.pop();
+    path
+}
+
+// 配置目录 = 程序运行目录
+pub fn get_config_dir() -> PathBuf {
+    get_app_dir()
+}
+
+// 日志目录 = 程序运行目录
+pub fn get_log_dir() -> PathBuf {
+    get_app_dir()
+}
+
+// 从运行目录config.ini的[option]节点读取配置
+pub fn read_config_opt(key: &str) -> Option<String> {
+    let cfg_path = get_app_dir().join("config.ini");
+    if !cfg_path.exists() {
+        return None;
+    }
+    let ini = Ini::load_from_file(cfg_path).ok()?;
+    let sec = ini.section(Some("option"))?;
+    sec.get(key).map(|v| v.trim().to_string())
+}
+
+
 pub fn global_init() -> bool {
     #[cfg(target_os = "linux")]
     {
@@ -3004,4 +3036,6 @@ mod tests {
         assert_eq!(combined_mask & MOUSE_TYPE_MASK, MOUSE_TYPE_DOWN);
         assert_eq!(combined_mask >> 3, MOUSE_BUTTON_LEFT | MOUSE_BUTTON_RIGHT);
     }
+
+    
 }
