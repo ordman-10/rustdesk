@@ -252,7 +252,25 @@ pub fn core_main() -> Option<Vec<String>> {
                 let options = "desktopicon startmenu";
                 #[cfg(windows)]
                 let options = "desktopicon startmenu printer";
-                let res = platform::install_me(options, "".to_owned(), true, args.len() > 1);
+
+                let mut install_path = String::new();
+                let mut debug = false;
+                let mut i = 1;
+                while i < args.len() {
+                    let arg = &args[i];
+                    if arg == "--debug" {
+                        debug = true;
+                    } else if !arg.starts_with('-') {
+                        // 第一个非选项参数作为安装路径
+                        if install_path.is_empty() {
+                            install_path = arg.clone();
+                        }
+                    }
+                    i += 1;
+                }
+                let res = platform::install_me(options, install_path, true, debug);
+                
+                //let res = platform::install_me(options, "".to_owned(), true, args.len() > 1);
                 let text = match res {
                     Ok(_) => translate("Installation Successful!".to_string()),
                     Err(err) => {
