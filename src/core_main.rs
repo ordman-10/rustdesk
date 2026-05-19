@@ -285,6 +285,8 @@ pub fn core_main() -> Option<Vec<String>> {
                     .duration(Duration::Short)
                     .show()
                     .ok();
+                
+                println!("->Installed!");
                 return None;
             } else if args[0] == "--uninstall-cert" {
                 #[cfg(windows)]
